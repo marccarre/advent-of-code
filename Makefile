@@ -16,6 +16,7 @@ build:
 
 .PHONY: lint
 lint:
+	docker run -v $(CURRENT_DIR):/mnt/lint marccarre/linter:latest
 	docker build --target lint $(CURRENT_DIR)
 
 .PHONY: test
