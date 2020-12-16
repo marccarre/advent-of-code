@@ -1,0 +1,9 @@
+name: Continuous Integration & Testing
+on: [push, pull_request]
+jobs:
+  all:
+    name: Build, lint, test and check code coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make
