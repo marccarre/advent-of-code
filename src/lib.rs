@@ -3,7 +3,7 @@ use std::result::Result;
 /// https://adventofcode.com/2020/day/1
 /// Runtime complexity: O(n.log(n))
 /// Space complexity: O(1)
-pub fn day_01(array: &mut Vec<u32>, target: u32) -> Result<u32, Error> {
+pub fn day_01_part1(array: &mut Vec<u32>, target: u32) -> Result<u32, Error> {
     array.sort_unstable(); // Quicksort, given primitives.
     for &x in array.iter() {
         let y = target - x;
@@ -11,7 +11,24 @@ pub fn day_01(array: &mut Vec<u32>, target: u32) -> Result<u32, Error> {
             return Ok(x * y);
         }
     }
-    Err(Error::new(&format!("no two numbers sum up to {}", target)))
+    Err(Error::new(&format!("no 2 numbers sum up to {}", target)))
+}
+
+/// https://adventofcode.com/2020/day/1#part2
+/// Runtime complexity: O(n^2.log(n))
+/// Space complexity: O(1)
+/// N.B.: we could optimise the binary search by providing from & to indexes.
+pub fn day_01_part2(array: &mut Vec<u32>, target: u32) -> Result<u32, Error> {
+    array.sort_unstable(); // Quicksort, given primitives.
+    for i in 0..array.len() - 1 {
+        for j in i + 1..array.len() {
+            let sum = array[i] + array[j];
+            if let Ok(k) = array.binary_search(&(target - sum)) {
+                return Ok(array[i] * array[j] * array[k]);
+            }
+        }
+    }
+    Err(Error::new(&format!("no 3 numbers sum up to {}", target)))
 }
 
 #[derive(Debug, PartialEq)]
@@ -30,10 +47,29 @@ impl Error {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
-    fn test_day_01() {
+    fn test_day_01_part1() {
         let target = 2020;
-        let mut array: Vec<u32> = vec![
+        assert_eq!(day_01_part1(&mut input_day_01(), target), Ok(793524));
+        assert_eq!(
+            day_01_part1(&mut vec![100, 200], target),
+            Err(Error::new(&format!("no 2 numbers sum up to {}", target)))
+        );
+    }
+
+    #[test]
+    fn test_day_01_part2() {
+        let target = 2020;
+        assert_eq!(day_01_part2(&mut input_day_01(), target), Ok(61515678));
+        assert_eq!(
+            day_01_part2(&mut vec![100, 200, 300], target),
+            Err(Error::new(&format!("no 3 numbers sum up to {}", target)))
+        );
+    }
+
+    fn input_day_01() -> Vec<u32> {
+        return vec![
             1293, 1207, 1623, 1675, 1842, 1410, 85, 1108, 557, 1217, 1506, 1956, 1579, 1614, 1360,
             1544, 1946, 1666, 1972, 1814, 1699, 1778, 1529, 2002, 1768, 1173, 1407, 1201, 1264,
             1739, 1774, 1951, 1980, 1428, 1381, 1714, 884, 1939, 1295, 1694, 1168, 1971, 1352,
@@ -50,8 +86,5 @@ mod tests {
             1444, 1517, 1167, 1738, 1519, 1263, 1901, 1627, 1644, 1771, 1812, 1270, 1497, 1707,
             1708, 1396,
         ];
-        assert_eq!(day_01(&mut array, target), Ok(793524));
-        let expected_err = Err(Error::new(&format!("no two numbers sum up to {}", target)));
-        assert_eq!(day_01(&mut vec![100, 200], target), expected_err);
     }
 }
