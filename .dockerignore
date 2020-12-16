@@ -1,0 +1,8 @@
+.dockerignore
+.git/
+.gitignore
+Cargo.lock
+Dockerfile
+Makefile
+README.md
+target/
