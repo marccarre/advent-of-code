@@ -3,7 +3,7 @@ use std::result::Result;
 /// https://adventofcode.com/2020/day/1
 /// Runtime complexity: O(n.log(n))
 /// Space complexity: O(1)
-pub fn day_01_part1(array: &mut Vec<u32>, target: u32) -> Result<u32, Error> {
+pub fn day_01_part1(array: &mut Vec<u32>, target: u32) -> Result<u32, NoSolution> {
     array.sort_unstable(); // Quicksort, given primitives.
     for &x in array.iter() {
         let y = target - x;
@@ -11,14 +11,17 @@ pub fn day_01_part1(array: &mut Vec<u32>, target: u32) -> Result<u32, Error> {
             return Ok(x * y);
         }
     }
-    Err(Error::new(&format!("no 2 numbers sum up to {}", target)))
+    Err(NoSolution::new(&format!(
+        "no two numbers sum up to {}",
+        target
+    )))
 }
 
 /// https://adventofcode.com/2020/day/1#part2
 /// Runtime complexity: O(n^2.log(n))
 /// Space complexity: O(1)
 /// N.B.: we could optimise the binary search by providing from & to indexes.
-pub fn day_01_part2(array: &mut Vec<u32>, target: u32) -> Result<u32, Error> {
+pub fn day_01_part2(array: &mut Vec<u32>, target: u32) -> Result<u32, NoSolution> {
     array.sort_unstable(); // Quicksort, given primitives.
     for i in 0..array.len() - 1 {
         for j in i + 1..array.len() {
@@ -28,17 +31,20 @@ pub fn day_01_part2(array: &mut Vec<u32>, target: u32) -> Result<u32, Error> {
             }
         }
     }
-    Err(Error::new(&format!("no 3 numbers sum up to {}", target)))
+    Err(NoSolution::new(&format!(
+        "no three numbers sum up to {}",
+        target
+    )))
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Error {
+pub struct NoSolution {
     why: String,
 }
 
-impl Error {
-    fn new(why: &str) -> Error {
-        Error {
+impl NoSolution {
+    fn new(why: &str) -> NoSolution {
+        NoSolution {
             why: why.to_string(),
         }
     }
@@ -58,7 +64,10 @@ mod tests {
         assert_eq!(day_01_part1(&mut array, target), Ok(793524));
         assert_eq!(
             day_01_part1(&mut vec![100, 200], target),
-            Err(Error::new(&format!("no 2 numbers sum up to {}", target)))
+            Err(NoSolution::new(&format!(
+                "no two numbers sum up to {}",
+                target
+            )))
         );
         Ok(())
     }
@@ -70,7 +79,10 @@ mod tests {
         assert_eq!(day_01_part2(&mut array, target), Ok(61515678));
         assert_eq!(
             day_01_part2(&mut vec![100, 200, 300], target),
-            Err(Error::new(&format!("no 3 numbers sum up to {}", target)))
+            Err(NoSolution::new(&format!(
+                "no three numbers sum up to {}",
+                target
+            )))
         );
         Ok(())
     }
