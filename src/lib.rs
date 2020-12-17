@@ -109,19 +109,19 @@ mod tests {
 
     #[derive(Debug)]
     enum Error {
-        IoError(io::Error),
-        ParseError(num::ParseIntError),
+        Io(io::Error),
+        ParseInt(num::ParseIntError),
     }
 
     impl From<io::Error> for Error {
         fn from(error: io::Error) -> Self {
-            Error::IoError(error)
+            Error::Io(error)
         }
     }
 
     impl From<num::ParseIntError> for Error {
         fn from(error: num::ParseIntError) -> Self {
-            Error::ParseError(error)
+            Error::ParseInt(error)
         }
     }
 }
