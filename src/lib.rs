@@ -37,6 +37,19 @@ pub fn day_01_part2(array: &mut Vec<u32>, target: u32) -> Result<u32, NoSolution
     )))
 }
 
+/// https://adventofcode.com/2020/day/2
+/// Runtime complexity: O(n)
+/// Space complexity: O(1)
+pub fn day_02_part1(array: &[(usize, usize, String, String)]) -> usize {
+    array
+        .iter()
+        .filter(|(min, max, character, password)| {
+            let count = &password.matches(character).count();
+            min <= count && count <= max
+        })
+        .count()
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -53,6 +66,7 @@ impl NoSolution {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use regex::Regex;
     use std::fs::File;
     use std::io::{self, BufRead};
     use std::num;
@@ -88,6 +102,13 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn test_day_02_part1() -> Result<(), Error> {
+        let array = input_day_02()?;
+        assert_eq!(day_02_part1(&array), 439);
+        Ok(())
+    }
+
     fn input_day_01() -> Result<Vec<u32>, Error> {
         let mut array = Vec::new();
         let lines = read_lines("2020-12-01.txt")?;
@@ -95,6 +116,22 @@ mod tests {
             let line = line?;
             let x = line.parse::<u32>()?;
             array.push(x);
+        }
+        Ok(array)
+    }
+
+    fn input_day_02() -> Result<Vec<(usize, usize, String, String)>, Error> {
+        let re = Regex::new(r"(\d+)-(\d+) ([a-z]): ([a-z]+)")?;
+        let mut array = Vec::new();
+        let lines = read_lines("2020-12-02.txt")?;
+        for line in lines {
+            let line = line?;
+            let cap = re.captures(&line).unwrap();
+            let min = cap[1].parse::<usize>()?;
+            let max = cap[2].parse::<usize>()?;
+            let character = cap[3].to_string();
+            let password = cap[4].to_string();
+            array.push((min, max, character, password));
         }
         Ok(array)
     }
@@ -111,6 +148,7 @@ mod tests {
     enum Error {
         Io(io::Error),
         ParseInt(num::ParseIntError),
+        Regex(regex::Error),
     }
 
     impl From<io::Error> for Error {
@@ -122,6 +160,12 @@ mod tests {
     impl From<num::ParseIntError> for Error {
         fn from(error: num::ParseIntError) -> Self {
             Error::ParseInt(error)
+        }
+    }
+
+    impl From<regex::Error> for Error {
+        fn from(error: regex::Error) -> Self {
+            Error::Regex(error)
         }
     }
 }

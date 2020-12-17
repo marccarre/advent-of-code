@@ -9,3 +9,4 @@ edition = "2018"
 [lib]
 
 [dependencies]
+regex = "1.4.2"
