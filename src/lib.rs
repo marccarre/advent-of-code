@@ -52,37 +52,39 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn test_day_01_part1() {
+    fn test_day_01_part1() -> io::Result<()> {
+        let mut array = input_day_01()?;
         let target = 2020;
-        assert_eq!(day_01_part1(&mut input_day_01(), target), Ok(793524));
+        assert_eq!(day_01_part1(&mut array, target), Ok(793524));
         assert_eq!(
             day_01_part1(&mut vec![100, 200], target),
             Err(Error::new(&format!("no 2 numbers sum up to {}", target)))
         );
+        Ok(())
     }
 
     #[test]
-    fn test_day_01_part2() {
+    fn test_day_01_part2() -> io::Result<()> {
+        let mut array = input_day_01()?;
         let target = 2020;
-        assert_eq!(day_01_part2(&mut input_day_01(), target), Ok(61515678));
+        assert_eq!(day_01_part2(&mut array, target), Ok(61515678));
         assert_eq!(
             day_01_part2(&mut vec![100, 200, 300], target),
             Err(Error::new(&format!("no 3 numbers sum up to {}", target)))
         );
+        Ok(())
     }
 
-    fn input_day_01() -> Vec<u32> {
+    fn input_day_01() -> io::Result<Vec<u32>> {
         let mut array = Vec::new();
-        if let Ok(lines) = read_lines("2020-12-01.txt") {
-            for line in lines {
-                if let Ok(line) = line {
-                    if let Ok(x) = line.parse::<u32>() {
-                        array.push(x);
-                    }
-                }
+        let lines = read_lines("2020-12-01.txt")?;
+        for line in lines {
+            let line = line?;
+            if let Ok(x) = line.parse::<u32>() {
+                array.push(x);
             }
         }
-        array
+        Ok(array)
     }
 
     fn read_lines(filename: &str) -> io::Result<io::Lines<io::BufReader<File>>> {
