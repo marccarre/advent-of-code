@@ -55,10 +55,11 @@ mod tests {
     use super::*;
     use std::fs::File;
     use std::io::{self, BufRead};
+    use std::num;
     use std::path::PathBuf;
 
     #[test]
-    fn test_day_01_part1() -> io::Result<()> {
+    fn test_day_01_part1() -> Result<(), Error> {
         let mut array = input_day_01()?;
         let target = 2020;
         assert_eq!(day_01_part1(&mut array, target), Ok(793524));
@@ -73,7 +74,7 @@ mod tests {
     }
 
     #[test]
-    fn test_day_01_part2() -> io::Result<()> {
+    fn test_day_01_part2() -> Result<(), Error> {
         let mut array = input_day_01()?;
         let target = 2020;
         assert_eq!(day_01_part2(&mut array, target), Ok(61515678));
@@ -87,23 +88,40 @@ mod tests {
         Ok(())
     }
 
-    fn input_day_01() -> io::Result<Vec<u32>> {
+    fn input_day_01() -> Result<Vec<u32>, Error> {
         let mut array = Vec::new();
         let lines = read_lines("2020-12-01.txt")?;
         for line in lines {
             let line = line?;
-            if let Ok(x) = line.parse::<u32>() {
-                array.push(x);
-            }
+            let x = line.parse::<u32>()?;
+            array.push(x);
         }
         Ok(array)
     }
 
-    fn read_lines(filename: &str) -> io::Result<io::Lines<io::BufReader<File>>> {
+    fn read_lines(filename: &str) -> Result<io::Lines<io::BufReader<File>>, Error> {
         let filepath = [env!("CARGO_MANIFEST_DIR"), "tests", "resources", filename]
             .iter()
             .collect::<PathBuf>();
         let file = File::open(filepath)?;
         Ok(io::BufReader::new(file).lines())
+    }
+
+    #[derive(Debug)]
+    enum Error {
+        IoError(io::Error),
+        ParseError(num::ParseIntError),
+    }
+
+    impl From<io::Error> for Error {
+        fn from(error: io::Error) -> Self {
+            Error::IoError(error)
+        }
+    }
+
+    impl From<num::ParseIntError> for Error {
+        fn from(error: num::ParseIntError) -> Self {
+            Error::ParseError(error)
+        }
     }
 }
