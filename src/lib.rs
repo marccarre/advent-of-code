@@ -50,6 +50,21 @@ pub fn day_02_part1(array: &[(usize, usize, String, String)]) -> usize {
         .count()
 }
 
+/// https://adventofcode.com/2020/day/2#part2
+/// Runtime complexity: O(n)
+/// Space complexity: O(1)
+pub fn day_02_part2(array: &[(usize, usize, String, String)]) -> usize {
+    array
+        .iter()
+        .filter(|(i, j, character, password)| {
+            let c1 = password.chars().nth(i - 1).unwrap(); // Indexes are 1-based and always valid.
+            let c2 = password.chars().nth(j - 1).unwrap(); // Indexes are 1-based and always valid.
+            let c = character.chars().next().unwrap(); // Always only 1 char.
+            ((c1 == c) || (c2 == c)) && !((c1 == c) && (c2 == c))
+        })
+        .count()
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -106,6 +121,13 @@ mod tests {
     fn test_day_02_part1() -> Result<(), Error> {
         let array = input_day_02()?;
         assert_eq!(day_02_part1(&array), 439);
+        Ok(())
+    }
+
+    #[test]
+    fn test_day_02_part2() -> Result<(), Error> {
+        let array = input_day_02()?;
+        assert_eq!(day_02_part2(&array), 584);
         Ok(())
     }
 
