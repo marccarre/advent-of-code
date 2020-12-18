@@ -68,16 +68,32 @@ pub fn day_02_part2(array: &[(usize, usize, String, String)]) -> usize {
 /// https://adventofcode.com/2020/day/3
 /// Runtime complexity: O(n*m)
 /// Space complexity: O(1)
-pub fn day_03_part1(grid: &[String]) -> Option<usize> {
-    let (mut num_trees, mut col) = (0, 0);
-    for row in grid.iter() {
-        let cell = row.chars().nth(col)?; // O(m), s.t. m is number of columns.
+pub fn day_03_part1(grid: &[String]) -> usize {
+    count_trees(grid, 3, 1)
+}
+
+fn count_trees(grid: &[String], step_right: usize, step_down: usize) -> usize {
+    let (mut num_trees, mut row, mut col) = (0, 0, 0);
+    while row < grid.len() {
+        let cell = grid[row].chars().nth(col).unwrap(); // O(m), s.t. m is number of columns.
         if cell == '#' {
             num_trees += 1;
         }
-        col = (col + 3) % row.len();
+        col = (col + step_right) % grid[row].len();
+        row += step_down;
     }
-    Some(num_trees)
+    num_trees
+}
+
+/// https://adventofcode.com/2020/day/3#part2
+/// Runtime complexity: O(n*m)
+/// Space complexity: O(1)
+pub fn day_03_part2(grid: &[String]) -> usize {
+    count_trees(grid, 1, 1)
+        * count_trees(grid, 3, 1)
+        * count_trees(grid, 5, 1)
+        * count_trees(grid, 7, 1)
+        * count_trees(grid, 1, 2)
 }
 
 #[derive(Debug, PartialEq)]
@@ -150,7 +166,14 @@ mod tests {
     #[test]
     fn test_day_03_part1() -> Result<(), Error> {
         let lines = input_day_03()?;
-        assert_eq!(day_03_part1(&lines), Some(211));
+        assert_eq!(day_03_part1(&lines), 211);
+        Ok(())
+    }
+
+    #[test]
+    fn test_day_03_part2() -> Result<(), Error> {
+        let lines = input_day_03()?;
+        assert_eq!(day_03_part2(&lines), 3584591857);
         Ok(())
     }
 
