@@ -65,6 +65,21 @@ pub fn day_02_part2(array: &[(usize, usize, String, String)]) -> usize {
         .count()
 }
 
+/// https://adventofcode.com/2020/day/3
+/// Runtime complexity: O(n*m)
+/// Space complexity: O(1)
+pub fn day_03_part1(grid: &[String]) -> Option<usize> {
+    let (mut num_trees, mut col) = (0, 0);
+    for row in grid.iter() {
+        let cell = row.chars().nth(col)?; // O(m), s.t. m is number of columns.
+        if cell == '#' {
+            num_trees += 1;
+        }
+        col = (col + 3) % row.len();
+    }
+    Some(num_trees)
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -82,6 +97,7 @@ impl NoSolution {
 mod tests {
     use super::*;
     use regex::Regex;
+    use std::fs;
     use std::fs::File;
     use std::io::{self, BufRead};
     use std::num;
@@ -131,6 +147,13 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn test_day_03_part1() -> Result<(), Error> {
+        let lines = input_day_03()?;
+        assert_eq!(day_03_part1(&lines), Some(211));
+        Ok(())
+    }
+
     fn input_day_01() -> Result<Vec<u32>, Error> {
         let mut array = Vec::new();
         let lines = read_lines("2020-12-01.txt")?;
@@ -158,14 +181,21 @@ mod tests {
         Ok(array)
     }
 
+    fn input_day_03() -> Result<Vec<String>, Error> {
+        let content = fs::read_to_string(filepath("2020-12-03.txt"))?;
+        Ok(content.trim().split('\n').map(String::from).collect())
+    }
+
     fn read_lines(filename: &str) -> Result<io::Lines<io::BufReader<File>>, Error> {
-        let filepath = [env!("CARGO_MANIFEST_DIR"), "tests", "resources", filename]
-            .iter()
-            .collect::<PathBuf>();
-        let file = File::open(filepath)?;
+        let file = File::open(filepath(filename))?;
         Ok(io::BufReader::new(file).lines())
     }
 
+    fn filepath(filename: &str) -> PathBuf {
+        [env!("CARGO_MANIFEST_DIR"), "tests", "resources", filename]
+            .iter()
+            .collect::<PathBuf>()
+    }
     #[derive(Debug)]
     enum Error {
         Io(io::Error),
