@@ -1,3 +1,8 @@
+#[macro_use]
+extern crate lazy_static;
+extern crate regex;
+
+use regex::Regex;
 use std::collections::HashMap;
 use std::result::Result;
 
@@ -112,6 +117,150 @@ pub fn day_04_part1(array: &[HashMap<String, String>]) -> usize {
         .count()
 }
 
+/// https://adventofcode.com/2020/day/4#part2
+/// Runtime complexity: O(n)
+/// Space complexity: O(1)
+pub fn day_04_part2(array: &[HashMap<String, String>]) -> usize {
+    array.iter().filter(|&map| is_valid_passport(map)).count()
+}
+
+fn is_valid_passport(map: &HashMap<String, String>) -> bool {
+    if !contains_valid_byr(map) {
+        return false;
+    }
+    if !contains_valid_iyr(map) {
+        return false;
+    }
+    if !contains_valid_eyr(map) {
+        return false;
+    }
+    if !contains_valid_hgt(map) {
+        return false;
+    }
+    if !contains_valid_hcl(map) {
+        return false;
+    }
+    if !contains_valid_ecl(map) {
+        return false;
+    }
+    if !contains_valid_pid(map) {
+        return false;
+    }
+    true
+}
+
+lazy_static! {
+    static ref YEAR: Regex = Regex::new(r"^\d{4}$").unwrap();
+    static ref HEIGHT: Regex = Regex::new(r"^(\d+)(cm|in)$").unwrap();
+    static ref HAIR_COLOR: Regex = Regex::new(r"^#[0-9a-f]{6}$").unwrap();
+    static ref EYE_COLOR: Regex = Regex::new(r"^amb|blu|brn|gry|grn|hzl|oth$").unwrap();
+    static ref PASSPORT_ID: Regex = Regex::new(r"^\d{9}$").unwrap();
+}
+
+fn contains_valid_byr(map: &HashMap<String, String>) -> bool {
+    if let Some(byr) = map.get(&"byr".to_string()) {
+        if is_valid_byr(&byr) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_valid_byr(byr: &str) -> bool {
+    if YEAR.is_match(byr) {
+        let byr = byr.parse::<u16>().unwrap();
+        1920 <= byr && byr <= 2002
+    } else {
+        false
+    }
+}
+
+fn contains_valid_iyr(map: &HashMap<String, String>) -> bool {
+    if let Some(iyr) = map.get(&"iyr".to_string()) {
+        if is_valid_iyr(&iyr) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_valid_iyr(iyr: &str) -> bool {
+    if YEAR.is_match(iyr) {
+        let iyr = iyr.parse::<u16>().unwrap();
+        2010 <= iyr && iyr <= 2020
+    } else {
+        false
+    }
+}
+
+fn contains_valid_eyr(map: &HashMap<String, String>) -> bool {
+    if let Some(eyr) = map.get(&"eyr".to_string()) {
+        if is_valid_eyr(&eyr) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_valid_eyr(eyr: &str) -> bool {
+    if YEAR.is_match(eyr) {
+        let eyr = eyr.parse::<u16>().unwrap();
+        2020 <= eyr && eyr <= 2030
+    } else {
+        false
+    }
+}
+
+fn contains_valid_hgt(map: &HashMap<String, String>) -> bool {
+    if let Some(hgt) = map.get(&"hgt".to_string()) {
+        if is_valid_hgt(&hgt) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_valid_hgt(hgt: &str) -> bool {
+    if let Some(cap) = HEIGHT.captures(&hgt) {
+        let value = cap[1].parse::<u16>().unwrap();
+        let unit = cap[2].to_string();
+        if unit == "cm" && 150 <= value && value <= 193 {
+            return true;
+        }
+        if unit == "in" && 59 <= value && value <= 76 {
+            return true;
+        }
+    }
+    false
+}
+
+fn contains_valid_hcl(map: &HashMap<String, String>) -> bool {
+    if let Some(hcl) = map.get(&"hcl".to_string()) {
+        if HAIR_COLOR.is_match(&hcl) {
+            return true;
+        }
+    }
+    false
+}
+
+fn contains_valid_ecl(map: &HashMap<String, String>) -> bool {
+    if let Some(ecl) = map.get(&"ecl".to_string()) {
+        if EYE_COLOR.is_match(&ecl) {
+            return true;
+        }
+    }
+    false
+}
+
+fn contains_valid_pid(map: &HashMap<String, String>) -> bool {
+    if let Some(pid) = map.get(&"pid".to_string()) {
+        if PASSPORT_ID.is_match(&pid) {
+            return true;
+        }
+    }
+    false
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -128,7 +277,6 @@ impl NoSolution {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use regex::Regex;
     use std::fs;
     use std::fs::File;
     use std::io::{self, BufRead};
@@ -197,6 +345,13 @@ mod tests {
     fn test_day_04_part1() -> Result<(), Error> {
         let array = input_day_04()?;
         assert_eq!(day_04_part1(&array), 237);
+        Ok(())
+    }
+
+    #[test]
+    fn test_day_04_part2() -> Result<(), Error> {
+        let array = input_day_04()?;
+        assert_eq!(day_04_part2(&array), 172);
         Ok(())
     }
 
