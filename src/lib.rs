@@ -332,6 +332,27 @@ pub fn day_06_part1(groups: &[Vec<String>]) -> usize {
         .sum()
 }
 
+/// https://adventofcode.com/2020/day/6#part2
+/// Runtime complexity: O(|groups| * (|group| + |alphabet|))
+/// Space complexity: O(|alphabet|)
+pub fn day_06_part2(groups: &[Vec<String>]) -> usize {
+    groups
+        .iter()
+        .map(|group| {
+            let mut counter: HashMap<char, usize> = HashMap::new();
+            for answers in group.iter() {
+                for c in answers.chars() {
+                    *counter.entry(c).or_insert(0) += 1;
+                }
+            }
+            counter
+                .values()
+                .filter(|&&count| count == group.len())
+                .count()
+        })
+        .sum()
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -444,6 +465,13 @@ mod tests {
     fn test_day_06_part1() -> Result<(), Error> {
         let groups = input_day_06()?;
         assert_eq!(day_06_part1(&groups), 7110);
+        Ok(())
+    }
+
+    #[test]
+    fn test_day_06_part2() -> Result<(), Error> {
+        let groups = input_day_06()?;
+        assert_eq!(day_06_part2(&groups), 3628);
         Ok(())
     }
 
