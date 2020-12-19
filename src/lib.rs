@@ -314,6 +314,24 @@ pub fn day_05_part2(array: &[String]) -> usize {
     max_id
 }
 
+/// https://adventofcode.com/2020/day/6
+/// Runtime complexity: O(n)
+/// Space complexity: O(|alphabet|)
+pub fn day_06_part1(groups: &[Vec<String>]) -> usize {
+    groups
+        .iter()
+        .map(|group| {
+            let mut chars = HashSet::new();
+            for answers in group.iter() {
+                for c in answers.chars() {
+                    chars.insert(c);
+                }
+            }
+            chars.len()
+        })
+        .sum()
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -422,6 +440,13 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn test_day_06_part1() -> Result<(), Error> {
+        let groups = input_day_06()?;
+        assert_eq!(day_06_part1(&groups), 7110);
+        Ok(())
+    }
+
     fn input_day_01() -> Result<Vec<u32>, Error> {
         let mut array = Vec::new();
         let lines = read_lines_iter("2020-12-01.txt")?;
@@ -471,6 +496,23 @@ mod tests {
             }
         }
         Ok(array)
+    }
+
+    fn input_day_06() -> Result<Vec<Vec<String>>, Error> {
+        let mut groups = Vec::new();
+        let mut group = Vec::new();
+        let lines = read_lines_iter("2020-12-06.txt")?;
+        for line in lines {
+            let line = line?;
+            if line.is_empty() {
+                groups.push(group);
+                group = Vec::new();
+            } else {
+                group.push(line);
+            }
+        }
+        groups.push(group);
+        Ok(groups)
     }
 
     fn read_lines_iter(filename: &str) -> Result<io::Lines<io::BufReader<File>>, Error> {
