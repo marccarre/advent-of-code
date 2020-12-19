@@ -329,14 +329,14 @@ mod tests {
 
     #[test]
     fn test_day_03_part1() -> Result<(), Error> {
-        let lines = input_day_03()?;
+        let lines = read_lines("2020-12-03.txt")?;
         assert_eq!(day_03_part1(&lines), 211);
         Ok(())
     }
 
     #[test]
     fn test_day_03_part2() -> Result<(), Error> {
-        let lines = input_day_03()?;
+        let lines = read_lines("2020-12-03.txt")?;
         assert_eq!(day_03_part2(&lines), 3584591857);
         Ok(())
     }
@@ -357,7 +357,7 @@ mod tests {
 
     fn input_day_01() -> Result<Vec<u32>, Error> {
         let mut array = Vec::new();
-        let lines = read_lines("2020-12-01.txt")?;
+        let lines = read_lines_iter("2020-12-01.txt")?;
         for line in lines {
             let line = line?;
             let x = line.parse::<u32>()?;
@@ -369,7 +369,7 @@ mod tests {
     fn input_day_02() -> Result<Vec<(usize, usize, String, String)>, Error> {
         let re = Regex::new(r"(\d+)-(\d+) ([a-z]): ([a-z]+)")?;
         let mut array = Vec::new();
-        let lines = read_lines("2020-12-02.txt")?;
+        let lines = read_lines_iter("2020-12-02.txt")?;
         for line in lines {
             let line = line?;
             let cap = re.captures(&line).unwrap();
@@ -382,15 +382,15 @@ mod tests {
         Ok(array)
     }
 
-    fn input_day_03() -> Result<Vec<String>, Error> {
-        let content = fs::read_to_string(filepath("2020-12-03.txt"))?;
+    fn read_lines(filename: &str) -> Result<Vec<String>, Error> {
+        let content = fs::read_to_string(filepath(filename))?;
         Ok(content.trim().split('\n').map(String::from).collect())
     }
 
     fn input_day_04() -> Result<Vec<HashMap<String, String>>, Error> {
         let mut array = Vec::new();
         let mut map = HashMap::new();
-        let lines = read_lines("2020-12-04.txt")?;
+        let lines = read_lines_iter("2020-12-04.txt")?;
         for line in lines {
             let line = line?;
             if line.is_empty() {
@@ -406,7 +406,7 @@ mod tests {
         Ok(array)
     }
 
-    fn read_lines(filename: &str) -> Result<io::Lines<io::BufReader<File>>, Error> {
+    fn read_lines_iter(filename: &str) -> Result<io::Lines<io::BufReader<File>>, Error> {
         let file = File::open(filepath(filename))?;
         Ok(io::BufReader::new(file).lines())
     }
