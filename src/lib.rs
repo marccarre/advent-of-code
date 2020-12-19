@@ -353,6 +353,43 @@ pub fn day_06_part2(groups: &[Vec<String>]) -> usize {
         .sum()
 }
 
+/// https://adventofcode.com/2020/day/7
+/// Runtime complexity: O(|colors|)
+/// Space complexity: O(|colors|)
+pub fn day_07_part1(rules: &HashMap<String, HashMap<String, usize>>, target: &str) -> usize {
+    let mut cache = HashMap::new();
+    rules
+        .keys()
+        .filter(|color| search_bags(&rules, &mut cache, &color, target))
+        .count()
+}
+
+fn search_bags(
+    rules: &HashMap<String, HashMap<String, usize>>,
+    cache: &mut HashMap<String, bool>,
+    key: &str,
+    target: &str,
+) -> bool {
+    if let Some(&found) = cache.get(key) {
+        return found;
+    }
+    let mut found = false;
+    if let Some(content) = rules.get(key) {
+        if content.contains_key(target) {
+            found = true;
+        } else {
+            for color in content.keys() {
+                if search_bags(&rules, cache, &color, &target) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+    }
+    cache.insert(key.to_string(), found);
+    found
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -475,6 +512,13 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn test_day_07_part1() -> Result<(), Error> {
+        let rules = input_day_07()?;
+        assert_eq!(day_07_part1(&rules, "shiny gold"), 121);
+        Ok(())
+    }
+
     fn input_day_01() -> Result<Vec<u32>, Error> {
         let mut array = Vec::new();
         let lines = read_lines_iter("2020-12-01.txt")?;
@@ -541,6 +585,27 @@ mod tests {
         }
         groups.push(group);
         Ok(groups)
+    }
+
+    fn input_day_07() -> Result<HashMap<String, HashMap<String, usize>>, Error> {
+        let re = Regex::new(r"(\d+) ([\w\s]+?) bags?")?;
+        let mut rules = HashMap::new();
+        let lines = read_lines_iter("2020-12-07.txt")?;
+        for line in lines {
+            let line = line?;
+            if line.is_empty() {
+                continue;
+            }
+            let rule = line.splitn(2, " bags contain ").collect::<Vec<&str>>();
+            let mut content = HashMap::new();
+            for cap in re.captures_iter(&rule[1]) {
+                let color = cap[2].to_string();
+                let count = cap[1].parse::<usize>()?;
+                content.insert(color, count);
+            }
+            rules.insert(rule[0].to_string(), content);
+        }
+        Ok(rules)
     }
 
     fn read_lines_iter(filename: &str) -> Result<io::Lines<io::BufReader<File>>, Error> {
