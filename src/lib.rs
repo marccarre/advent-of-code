@@ -3,7 +3,7 @@ extern crate lazy_static;
 extern crate regex;
 
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::result::Result;
 
 /// https://adventofcode.com/2020/day/1
@@ -291,6 +291,29 @@ fn binary_search_ticket(ticket: &str) -> Option<usize> {
     Some(lo)
 }
 
+/// https://adventofcode.com/2020/day/5#part2
+/// Runtime complexity: O(n)
+/// Space complexity: O(n)
+pub fn day_05_part2(array: &[String]) -> usize {
+    let (mut min_id, mut max_id) = (usize::max_value(), 0);
+    let mut seat_ids = HashSet::new();
+    for ticket in array.iter() {
+        let (row, col) = ticket.split_at(7);
+        let row = binary_search_ticket(row).unwrap();
+        let col = binary_search_ticket(col).unwrap();
+        let seat_id = row * 8 + col;
+        min_id = min_id.min(seat_id);
+        max_id = max_id.max(seat_id);
+        seat_ids.insert(seat_id);
+    }
+    for seat_id in min_id..max_id {
+        if !seat_ids.contains(&seat_id) {
+            return seat_id;
+        }
+    }
+    max_id
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -389,6 +412,13 @@ mod tests {
     fn test_day_05_part1() -> Result<(), Error> {
         let lines = read_lines("2020-12-05.txt")?;
         assert_eq!(day_05_part1(&lines), Some(861));
+        Ok(())
+    }
+
+    #[test]
+    fn test_day_05_part2() -> Result<(), Error> {
+        let lines = read_lines("2020-12-05.txt")?;
+        assert_eq!(day_05_part2(&lines), 633);
         Ok(())
     }
 
