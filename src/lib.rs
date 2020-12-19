@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::result::Result;
 
 /// https://adventofcode.com/2020/day/1
@@ -96,6 +97,21 @@ pub fn day_03_part2(grid: &[String]) -> usize {
         * count_trees(grid, 1, 2)
 }
 
+/// https://adventofcode.com/2020/day/4
+/// Runtime complexity: O(n)
+/// Space complexity: O(1)
+pub fn day_04_part1(array: &[HashMap<String, String>]) -> usize {
+    let mandatory_fields = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+    array
+        .iter()
+        .filter(|map| {
+            mandatory_fields
+                .iter()
+                .all(|&field| map.contains_key(field))
+        })
+        .count()
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -177,6 +193,13 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn test_day_04_part1() -> Result<(), Error> {
+        let array = input_day_04()?;
+        assert_eq!(day_04_part1(&array), 237);
+        Ok(())
+    }
+
     fn input_day_01() -> Result<Vec<u32>, Error> {
         let mut array = Vec::new();
         let lines = read_lines("2020-12-01.txt")?;
@@ -207,6 +230,25 @@ mod tests {
     fn input_day_03() -> Result<Vec<String>, Error> {
         let content = fs::read_to_string(filepath("2020-12-03.txt"))?;
         Ok(content.trim().split('\n').map(String::from).collect())
+    }
+
+    fn input_day_04() -> Result<Vec<HashMap<String, String>>, Error> {
+        let mut array = Vec::new();
+        let mut map = HashMap::new();
+        let lines = read_lines("2020-12-04.txt")?;
+        for line in lines {
+            let line = line?;
+            if line.is_empty() {
+                array.push(map);
+                map = HashMap::new();
+            } else {
+                for pair in line.split_whitespace() {
+                    let kvp = pair.splitn(2, ':').collect::<Vec<&str>>();
+                    map.insert(kvp[0].to_string(), kvp[1].to_string());
+                }
+            }
+        }
+        Ok(array)
     }
 
     fn read_lines(filename: &str) -> Result<io::Lines<io::BufReader<File>>, Error> {
