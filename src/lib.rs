@@ -390,6 +390,19 @@ fn search_bags(
     found
 }
 
+/// https://adventofcode.com/2020/day/7#part2
+/// Runtime complexity: O(|colors|)
+/// Space complexity: O(|colors|) -- because of the stack frames of the recursion.
+pub fn day_07_part2(rules: &HashMap<String, HashMap<String, usize>>, target: &str) -> usize {
+    let mut total = 0;
+    if let Some(content) = rules.get(target) {
+        for (color, count) in content.iter() {
+            total += count * (1 + day_07_part2(rules, color));
+        }
+    }
+    total
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -516,6 +529,13 @@ mod tests {
     fn test_day_07_part1() -> Result<(), Error> {
         let rules = input_day_07()?;
         assert_eq!(day_07_part1(&rules, "shiny gold"), 121);
+        Ok(())
+    }
+
+    #[test]
+    fn test_day_07_part2() -> Result<(), Error> {
+        let rules = input_day_07()?;
+        assert_eq!(day_07_part2(&rules, "shiny gold"), 3805);
         Ok(())
     }
 
