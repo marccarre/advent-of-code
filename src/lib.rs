@@ -261,6 +261,36 @@ fn contains_valid_pid(map: &HashMap<String, String>) -> bool {
     false
 }
 
+/// https://adventofcode.com/2020/day/5
+/// Runtime complexity: O(n)
+/// Space complexity: O(1)
+pub fn day_05_part1(array: &[String]) -> Option<usize> {
+    array
+        .iter()
+        .map(|ticket| {
+            let (row, col) = ticket.split_at(7);
+            let row = binary_search_ticket(row).unwrap();
+            let col = binary_search_ticket(col).unwrap();
+            row * 8 + col
+        })
+        .max()
+}
+
+fn binary_search_ticket(ticket: &str) -> Option<usize> {
+    let (mut lo, mut hi) = (0, 2usize.pow(ticket.len() as u32) - 1);
+    for c in ticket.chars() {
+        let mid = lo + (hi - lo) / 2;
+        if c == 'F' || c == 'L' {
+            hi = mid;
+        } else if c == 'B' || c == 'R' {
+            lo = mid + 1;
+        } else {
+            return None;
+        }
+    }
+    Some(lo)
+}
+
 #[derive(Debug, PartialEq)]
 pub struct NoSolution {
     why: String,
@@ -352,6 +382,13 @@ mod tests {
     fn test_day_04_part2() -> Result<(), Error> {
         let array = input_day_04()?;
         assert_eq!(day_04_part2(&array), 172);
+        Ok(())
+    }
+
+    #[test]
+    fn test_day_05_part1() -> Result<(), Error> {
+        let lines = read_lines("2020-12-05.txt")?;
+        assert_eq!(day_05_part1(&lines), Some(861));
         Ok(())
     }
 
